@@ -1,5 +1,5 @@
 import time
-from models.tweaks import Tweaks
+from ils.models.tweaks import Tweaks
 
 class LocalSearch:
     @staticmethod

@@ -1,0 +1,11 @@
+Summary of all instances:
+--------------------------------------------------------------------------------
+Instance             Algorithm                                          Score
+--------------------------------------------------------------------------------
+B50_L5_D4.txt        multirepresentation_solution                         581
+B50_L5_D4.txt        ils_solution_converted                               581
+B50_L5_D4.txt        final_ils_solution                                   581
+B60_L6_D6.txt        multirepresentation_solution                         900
+B60_L6_D6.txt        ils_solution_converted                               900
+B60_L6_D6.txt        final_ils_solution                                   900
+--------------------------------------------------------------------------------

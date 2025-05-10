@@ -1,11 +1,11 @@
 import random
 import time
-from models.solution import Solution
-from models.initial_solution import InitialSolution
-from models.local_search import LocalSearch
+from ils.models.solution import Solution
+from ils.models.initial_solution import InitialSolution
+from ils.models.local_search import LocalSearch
 
 class Solver:
-    def iterated_local_search(self, data, time_limit=300, max_iterations=1000, pool_size=5):
+    def iterated_local_search(self, data, current_solution: Solution, time_limit=300, max_iterations=1000, pool_size=5) -> Solution:
         """
         Perform Iterated Local Search (ILS) on the given problem data with enhanced acceptance and home base selection.
         Args:
@@ -31,7 +31,6 @@ class Solver:
         else:
             max_local_search_time = 1.0  # Default local search time
         
-        current_solution = InitialSolution.generate_initial_solution(data)
         start_time = time.time()
         best_solution = current_solution
         homebase_pool = []

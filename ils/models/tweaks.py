@@ -1,6 +1,5 @@
 import random
-import copy
-from models.solution import Solution
+from ils.models.solution import Solution
 
 class Tweaks:
     # Define weights for each tweak method

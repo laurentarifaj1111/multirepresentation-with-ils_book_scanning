@@ -1,9 +1,9 @@
 import random
 import time
 import heapq
-from models.solution import Solution
-from models.library import Library
-from models.local_search import LocalSearch
+from ils.models.solution import Solution
+from ils.models.library import Library
+from ils.models.local_search import LocalSearch
 
 
 class InitialSolution:

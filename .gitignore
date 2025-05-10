@@ -1,3 +1,3 @@
-models/__pycache__/
+ils/models/__pycache__/
 output/
-validator/__pycache__/
+ils/validator/__pycache__/
