@@ -21,7 +21,7 @@ class InitialSolutionGenerator:
 
             library = modifiable_libraries.pop(0)
 
-            if current_day + library.signup_time > total_days:
+            if current_day + library.signup_time >= total_days:
                 continue
 
             current_day += library.signup_time
@@ -42,8 +42,8 @@ class InitialSolutionGenerator:
                     solution.fitness += book.score
                 else:
                     unselected_books.append(book.id)
-
-            solution.books_to_scan[library.id] = selected_books
+            if len(selected_books) > 0:
+                solution.books_to_scan[library.id] = selected_books
             solution.unscanned_books[library.id] = unselected_books
 
         return solution

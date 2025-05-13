@@ -44,7 +44,8 @@ class Utils:
                 else:
                     unselected_books.append(book.id)
 
-            solution.books_to_scan[library.id] = selected_books
+            if len(unselected_books) > 0:
+                solution.books_to_scan[library.id] = selected_books
             solution.unscanned_books[library.id] = unselected_books
             solution.fitness += score
 
@@ -76,12 +77,10 @@ class Utils:
         scanned_books_per_library = OrderedDict(current_solution.scanned_books_per_library)
 
         for lib in instance.libraries:
-            if lib.id in unscanned_libs:
-                unscanned_books[lib.id] = lib.books
+            if lib.id in scanned_books_per_library:
+                unscanned_books[lib.id] = set(lib.books) - set(scanned_books_per_library[lib.id])
             else:
-                unsigned_books_per_lib = set(lib.books) - set(scanned_books_per_library.get(lib.id))
-                if unsigned_books_per_lib is not None and len(unsigned_books_per_lib) > 0:
-                    unscanned_books[lib.id] = unsigned_books_per_lib
+                unscanned_books[lib.id] = set(lib.books)
 
         solution_v2.books_to_scan = scanned_books_per_library
         solution_v2.unscanned_books = unscanned_books
