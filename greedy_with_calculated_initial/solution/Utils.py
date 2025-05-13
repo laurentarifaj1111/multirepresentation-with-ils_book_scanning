@@ -99,12 +99,13 @@ class Utils:
     @staticmethod
     def write_results(results:list, version:str ) -> None:
         # Convert to list of dicts
+        print(results)
         results_dict_list = [
             {
                 "instance_name": r.instance_name,
                 "combination": r.combination,
-                "initial_solution_score": r.initial_solution_score,
-                "other_representation_score": r.other_representation_score,
+                # "initial_solution_score": r.initial_solution_score,
+                # "other_representation_score": r.other_representation_score,
                 "version1_score": r.version1_score
             }
             for r in results
