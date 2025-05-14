@@ -1,10 +1,10 @@
 import os
 import time
 
-from greedy_with_calculated_initial.models import Results
-from greedy_with_calculated_initial.solution import Utils, InitialSolutionGenerator, SolutionOutputWriter
-from greedy_with_calculated_initial.solution.InstanceProvider import InstanceProvider
-from greedy_with_calculated_initial.solution.Solution import MultiRepresentationSolution
+from hill_climbing_with_greedy_initial.models import Results
+from hill_climbing_with_greedy_initial.solution import Utils, InitialSolutionGenerator, SolutionOutputWriter
+from hill_climbing_with_greedy_initial.solution.InstanceProvider import InstanceProvider
+from hill_climbing_with_greedy_initial.solution.Solution import HillClimbing
 from ils.models import Solver, Parser
 from ils.models.initial_solution import InitialSolution
 from ils.validator.multiple_validator import validate_all_solutions
@@ -12,162 +12,62 @@ from ils.validator.validator import validate_solution
 
 
 solver = Solver()
-multi_representation_solution = MultiRepresentationSolution()
+multi_representation_solution = HillClimbing()
 directory = os.listdir('./input')
 results = []
 results_ils = []
-output_dir = 'backup/output'
+output_dir = 'output/output'
 os.makedirs(output_dir, exist_ok=True)
-version = "version_final"
+version = "v1"
 
 multi_representation_solution_path = "./output/multi_representation/final/" + version + "/"
 initial_solution_ils_path = "./output/ils/initial/" + version + "/"
-final_solution_ils_path = "./output/ils/final/" + version + "/"
+solutions_path = "./output/ils/" + version + "/"
 results_summary_path = "./results/" + version + "/"
-# results_summary_path = "./backup/output/multi_representation/final/v1/"
+results_summary_path = "output/output/multi_representation/final/v1/"
 
 output_file_paths = [
-    (multi_representation_solution_path, "multirepresentation_solution_final"),
-    # (initial_solution_ils_path, "initial_solution_ils"),
-    # (final_solution_ils_path, "final_solution_ils")
+    (solutions_path, "final_solution_ils")
 ]
 
+def main():
+    file_names = Utils.get_input_file_names()
+    for file_name in file_names:
+        ten_minute_from_now = (time.time()) * 1000 + 600000
+        path = Utils.get_input_file_paths(file_name)
+        # Read Instance
+        instance = InstanceProvider.get_instance(path)
+        copy_of_ils_solution = None
 
-# def main():
-#     # optimum_solutions = [
-#     #     "B2.5k_L3_D90 (Appalachian Regional Project).txt",
-#     #     "B18k_L4_D365 (Oxford Bodleian Archives).txt",
-#     #     "B3k_L1_D1.4k (Vatican Secret Archives Project).txt",
-#     #     "B50_L5_D4.txt",
-#     #     "B70_L8_D7.txt",
-#     #     "B80_L7_D9.txt",
-#     #     "B90_L6_D11.txt",
-#     #     "B95_L5_D12.txt",
-#     #     "B96_L6_D14.txt",
-#     #     "B98_L4_D15.txt",
-#     #     "B99_L7_D16.txt",
-#     #     "B100_L9_D18.txt",
-#     #     "B150_L8_D10.txt",
-#     #     "B300_L11_D20.txt",
-#     #     "B500_L14_D18.txt",
-#     #     "B750_L20_D14.txt",
-#     #     "B1k_L18_D17.txt",
-#     #     "B1.5k_L20_D40.txt",
-#     #     "B4k_L30_D60.txt",
-#     #     "B6k_L35_D70.txt",
-#     #     "B9k_L40_D80.txt"
-#     # ]
-#     # file_names = Utils.get_input_file_names()
-#     # for file_name in (f for f in file_names if f not in optimum_solutions):
-#         file_name = "B1.5k_L20_D40.txt"
-#         path = Utils.get_input_file_paths(file_name)
-#         print(f"Calculating results for: {file_name}")
-#         instance = InstanceProvider.get_instance(path)
-#         solution = InitialSolutionGenerator.generate_initial_solution(instance)
-#         initial_score = solution.fitness
-#         print(f"Initial solution for instance: {file_name}, score: {solution.fitness}")
-#
-#
-#         improved_solution = multi_representation_solution.hill_climbing(solution.clone(), instance, 10000)
-#         multi_representation_score = improved_solution.fitness
-#         print(
-#             f"Solution for instance: {file_name}, score: {improved_solution.fitness}, from solution with representations v2")
-#         SolutionOutputWriter.write_solution_to_file(improved_solution, multi_representation_solution_path + file_name)
-#         results_ils.append((file_name, "multirepresentation_solution",  improved_solution.fitness))
-#
-#         parser = Parser(f'./input/{file_name}')
-#         data = parser.parse()
-#         ils_solution_converted = Utils.convert_solution(instance, improved_solution.clone())
-#         os.makedirs(os.path.dirname(initial_solution_ils_path), exist_ok=True)
-#         # ils_solution_converted.export(f'{initial_solution_ils_path}/{file_name}')
-#         results_ils.append((file_name, "ils_solution_converted",  ils_solution_converted.fitness_score))
-#
-#
-#         final_ils_solution = solver.iterated_local_search(data, ils_solution_converted, max_iterations=100)
-#         os.makedirs(os.path.dirname(final_solution_ils_path), exist_ok=True)
-#         final_ils_solution.export(f'{final_solution_ils_path}/{file_name}')
-#         print("convertin to multi rep solution")
-#         sol2 = Utils.convert_solution_to_v2(final_ils_solution, instance)
-#         print("final score:", sol2.fitness)
-#         new_solution = multi_representation_solution.hill_climbing(sol2, instance, 100)
-#         ils_v2 = Utils.convert_solution(instance, new_solution.clone())
-#         ils_v2.export(f'{final_solution_ils_path}/{file_name}')
-#
-#
-#         fitness = final_ils_solution.fitness_score
-#         results.append(Results(file_name, "ils", initial_score, multi_representation_score, fitness))
-#         os.path.isfile(final_solution_ils_path + file_name)
-#         results_ils.append((file_name, "final_ils_solution",  fitness))
-#
-#         print(f"ils Fitness for instance {file_name} is : {fitness}")
-#         solutionsValidationsForIteration(output_file_paths, file_name)
-#
-#
-#     # all_solution_validations(output_file_paths)
-#     # Utils.write_results(results, version)
+        # Generate Initital Solution using guided initial solution
+        solution = InitialSolutionGenerator.generate_initial_solution(instance)
+        parser = Parser(f'./input/{file_name}')
+        data = parser.parse()
 
+        while ten_minute_from_now > time.time() * 1000:
+            # Apply hill climbing for 100 iterations
+            hill_climbing_solution = multi_representation_solution.hill_climbing(solution.clone(), instance, 100)
 
-# def main():
-#     optimum_solutions = [
-#         "B2.5k_L3_D90 (Appalachian Regional Project).txt",
-#         "B18k_L4_D365 (Oxford Bodleian Archives).txt",
-#         "B3k_L1_D1.4k (Vatican Secret Archives Project).txt",
-#         "B50_L5_D4.txt",
-#         "B70_L8_D7.txt",
-#         "B80_L7_D9.txt",
-#         "B90_L6_D11.txt",
-#         "B95_L5_D12.txt",
-#         "B96_L6_D14.txt",
-#         "B98_L4_D15.txt",
-#         "B99_L7_D16.txt",
-#         "B100_L9_D18.txt",
-#         "B150_L8_D10.txt",
-#         "B300_L11_D20.txt",
-#         "B500_L14_D18.txt",
-#         "B750_L20_D14.txt",
-#         "B1k_L18_D17.txt",
-#         "B1.5k_L20_D40.txt",
-#         "B4k_L30_D60.txt",
-#         "B6k_L35_D70.txt",
-#         "B9k_L40_D80.txt"
-#     ]
-#     file_names = Utils.get_input_file_names()
-#     for file_name in (f for f in file_names if f not in optimum_solutions):
-#         current_time = (time.time()) * 1000 + 600000
-#         # file_name = "B1k_L18_D17.txt"
-#         path = Utils.get_input_file_paths(file_name)
-#         instance = InstanceProvider.get_instance(path)
-#         solution = InitialSolutionGenerator.generate_initial_solution(instance)
-#         print(f"Initial solution for instance: {file_name}, score: {solution.fitness}")
-#         parser = Parser(f'./input/{file_name}')
-#         data = parser.parse()
-#
-#         while current_time > time.time() * 1000:
-#             try:
-#                 print(f"Calculating with other representation: {file_name}")
-#                 improved_solution = multi_representation_solution.hill_climbing(solution.clone(), instance, 100)
-#                 print(f"Solution for instance: {file_name}, score: {improved_solution.fitness}, from solution with representations v2")
-#
-#                 ils_solution_converted = Utils.convert_solution(instance, improved_solution.clone())
-#                 final_ils_solution = solver.iterated_local_search(data, ils_solution_converted, max_iterations=100)
-#                 print("ils score:", final_ils_solution.fitness_score)
-#                 os.makedirs(os.path.dirname(final_solution_ils_path), exist_ok=True)
-#                 final_ils_solution.export(f'{final_solution_ils_path}/{file_name}')
-#
-#                 print("converting to other rep solution")
-#                 solution = Utils.convert_solution_to_v2(final_ils_solution, instance)
-#
-#                 solutionsValidationsForIteration(output_file_paths, file_name)
-#             except Exception as e:
-#                 print(e)
-#                 break
-#
-#         results.append(Results(file_name, "ils",   solution.fitness))
-#         results_ils.append((file_name, "ils_solution_converted",  solution.fitness))
-#
-#
-#     all_solution_validations(output_file_paths)
-#     Utils.write_results(results, version)
+            # Convert to other ils representation
+            ils_solution_converted = Utils.convert_solution(instance, hill_climbing_solution.clone())
+
+            # Apply iterated local search for 100 iterations
+            ils_solution = solver.iterated_local_search(data, ils_solution_converted, max_iterations=100)
+
+            # Convert to algorithm with greedy initial soultion representation
+            solution = Utils.convert_solution_to_v2(ils_solution, instance)
+
+            solutionsValidationsForIteration(output_file_paths, file_name)
+
+        # Create directory and export
+        os.makedirs(os.path.dirname(solutions_path), exist_ok=True)
+        ils_solution.export(f'{solutions_path}/{file_name}')
+
+        results.append(Results(file_name, "ils", solution.fitness))
+        results_ils.append((file_name, "ils_solution_converted", solution.fitness))
+
+    # Validate all solutions
+    all_solution_validations(output_file_paths)
 
 
 def solutionsValidationsForIteration(file_paths, file_name:str):
@@ -206,68 +106,5 @@ def all_solution_validations(file_paths):
         print(f"\nSummary has been written to: {summary_file}")
 
 
-def main():
-    optimum_solutions = [
-        "B2.5k_L3_D90 (Appalachian Regional Project).txt",
-        "B18k_L4_D365 (Oxford Bodleian Archives).txt",
-        "B3k_L1_D1.4k (Vatican Secret Archives Project).txt",
-        "B50_L5_D4.txt",
-        "B70_L8_D7.txt",
-        "B80_L7_D9.txt",
-        "B90_L6_D11.txt",
-        "B95_L5_D12.txt",
-        "B96_L6_D14.txt",
-        "B98_L4_D15.txt",
-        "B99_L7_D16.txt",
-        "B100_L9_D18.txt",
-        "B150_L8_D10.txt",
-        "B300_L11_D20.txt",
-        "B500_L14_D18.txt",
-        "B750_L20_D14.txt",
-        "B1k_L18_D17.txt",
-        "B1.5k_L20_D40.txt",
-        "B4k_L30_D60.txt",
-        "B6k_L35_D70.txt",
-        "B9k_L40_D80.txt"
-    ]
-    file_names = Utils.get_input_file_names()
-    for file_name in (f for f in file_names if f not in optimum_solutions):
-        current_time = (time.time()) * 1000 + 600000
-        # file_name = "B1000k_L115_D230.txt"
-        path = Utils.get_input_file_paths(file_name)
-        instance = InstanceProvider.get_instance(path)
-        parser = Parser(f'./input/{file_name}')
-        data = parser.parse()
-        solution = InitialSolution.generate_initial_solution(data)
-        print(f"Initial solution for instance: {file_name}, score: {solution.fitness_score}")
-
-        while current_time > time.time() * 1000:
-            try:
-                print("Running with ILS with inial score: " + str(solution.fitness_score))
-                final_ils_solution = solver.iterated_local_search(data, solution, max_iterations=100)
-                solution_v2 = Utils.convert_solution_to_v2(final_ils_solution, instance)
-                os.makedirs(os.path.dirname(multi_representation_solution_path + "/ils/" ), exist_ok=True)
-                final_ils_solution.export(f'{multi_representation_solution_path}/ils/{file_name}')
-
-                print("Running with Hill climbing with initial score: " + str(solution_v2.fitness))
-                improved_solution = multi_representation_solution.hill_climbing(solution_v2.clone(), instance, 100)
-
-                os.makedirs(os.path.dirname(multi_representation_solution_path), exist_ok=True)
-                SolutionOutputWriter.write_solution_to_file(improved_solution, multi_representation_solution_path + file_name)
-
-                solution = Utils.convert_solution(instance, improved_solution.clone())
-                solutionsValidationsForIteration(output_file_paths, file_name)
-            except Exception as e:
-                print(e)
-                break
-
-        results.append(Results(file_name, "ils",   solution.fitness_score))
-        results_ils.append((file_name, "ils_solution_converted",  solution.fitness_score))
-
-
-    all_solution_validations(output_file_paths)
-    Utils.write_results(results, version)
-
 if __name__ == "__main__":
-    # all_solution_validations(output_file_paths)
     main()

@@ -1,6 +1,6 @@
 from typing import List, Set
 
-from greedy_with_calculated_initial.models.Book import Book
+from hill_climbing_with_greedy_initial.models.Book import Book
 
 
 class Library:

@@ -1,6 +1,6 @@
 import os
 
-from greedy_with_calculated_initial.models.SolutionRepresentation import SolutionRepresentation
+from hill_climbing_with_greedy_initial.models.SolutionRepresentation import SolutionRepresentation
 
 
 class SolutionOutputWriter:

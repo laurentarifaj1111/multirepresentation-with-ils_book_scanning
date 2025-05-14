@@ -1,10 +1,12 @@
 import random
 
-from greedy_with_calculated_initial.solution.TweakOperatorParams import TweakOperatorParams
-from greedy_with_calculated_initial.solution.Utils import Utils
-from greedy_with_calculated_initial.models.Instance import Instance
-from greedy_with_calculated_initial.models.SolutionRepresentation import SolutionRepresentation
+from hill_climbing_with_greedy_initial.solution.TweakOperatorParams import TweakOperatorParams
+from hill_climbing_with_greedy_initial.solution.Utils import Utils
+from hill_climbing_with_greedy_initial.models.Instance import Instance
+from hill_climbing_with_greedy_initial.models.SolutionRepresentation import SolutionRepresentation
 
+
+# Replaces a random signed library with an unsigend library
 class ReplaceLibsTweakOperator:
     def tweak(self, solution: SolutionRepresentation, instance: Instance) -> SolutionRepresentation:
         books_to_scan = solution.books_to_scan
@@ -44,7 +46,7 @@ class ReplaceLibsTweakOperator:
 
         return Utils.generate_solution_for_libs_listed(instance, final_list)
 
-
+# Reorder 2 random signed libraries
 class ReorderLibsTweakOperator:
     def tweak(self, solution: SolutionRepresentation, instance: Instance) -> SolutionRepresentation:
         books_to_scan = solution.books_to_scan
@@ -59,7 +61,7 @@ class ReorderLibsTweakOperator:
         swapped_libs_order = Utils.swap_by_index(books_to_scan, first_index, second_index)
         return Utils.generate_solution_for_libs_listed(instance, swapped_libs_order)
 
-
+# Shuffles signed libraries
 class ShuffleLibsTweakOperator:
     def tweak(self, solution: SolutionRepresentation, instance: Instance) -> SolutionRepresentation:
         books_to_scan = solution.books_to_scan
@@ -71,7 +73,7 @@ class ShuffleLibsTweakOperator:
         random.shuffle(libs)  # Shuffle in-place
         return Utils.generate_solution_for_libs_listed(instance, libs)
 
-
+# Swaps books between 2 signed libraries with same book
 class SwapBooksTweakOperator:
     def tweak(self, solution: SolutionRepresentation, instance: Instance, params: TweakOperatorParams) -> SolutionRepresentation:
         rand = random.Random()

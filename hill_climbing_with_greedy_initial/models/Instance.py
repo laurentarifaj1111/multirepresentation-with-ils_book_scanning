@@ -1,7 +1,7 @@
 from typing import List, Set, Dict
 from collections import OrderedDict, defaultdict
 
-from greedy_with_calculated_initial.models.Library import Library
+from hill_climbing_with_greedy_initial.models.Library import Library
 
 
 class Instance:

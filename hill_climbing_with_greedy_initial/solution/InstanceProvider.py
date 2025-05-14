@@ -1,7 +1,7 @@
 
-from greedy_with_calculated_initial.models.Book import Book
-from greedy_with_calculated_initial.models.Instance import Instance
-from greedy_with_calculated_initial.models.Library import Library
+from hill_climbing_with_greedy_initial.models.Book import Book
+from hill_climbing_with_greedy_initial.models.Instance import Instance
+from hill_climbing_with_greedy_initial.models.Library import Library
 
 
 class InstanceProvider:

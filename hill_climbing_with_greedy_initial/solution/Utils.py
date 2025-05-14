@@ -5,8 +5,8 @@ from typing import List, Dict
 
 from ils.models import Solution
 from ils.models.library import Library
-from greedy_with_calculated_initial.models.Instance import Instance
-from greedy_with_calculated_initial.models.SolutionRepresentation import SolutionRepresentation
+from hill_climbing_with_greedy_initial.models.Instance import Instance
+from hill_climbing_with_greedy_initial.models.SolutionRepresentation import SolutionRepresentation
 
 
 current_dir = os.path.dirname(__file__)
@@ -73,7 +73,6 @@ class Utils:
         solution_v2 =  SolutionRepresentation()
         unscanned_books = OrderedDict()
 
-        unscanned_libs = current_solution.unsigned_libraries
         scanned_books_per_library = OrderedDict(current_solution.scanned_books_per_library)
 
         for lib in instance.libraries:
@@ -103,8 +102,8 @@ class Utils:
             {
                 "instance_name": r.instance_name,
                 "combination": r.combination,
-                # "initial_solution_score": r.initial_solution_score,
-                # "other_representation_score": r.other_representation_score,
+                "initial_solution_score": r.initial_solution_score,
+                "other_representation_score": r.other_representation_score,
                 "version1_score": r.version1_score
             }
             for r in results
