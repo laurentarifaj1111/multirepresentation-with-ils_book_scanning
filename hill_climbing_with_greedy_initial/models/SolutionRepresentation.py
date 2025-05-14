@@ -20,12 +20,6 @@ class SolutionRepresentation:
     def get_books_to_scann(self):
         return [book_id for book_list in self.books_to_scan.values() for book_id in book_list]
 
-    # def get_unsigned_libraries(self, instance: Instance):
-    #     books_to_scan = set(self.books_to_scan.keys())
-    #     unscanned_books = set(self.unscanned_books.keys())
-    #     result = unscanned_books - books_to_scan
-    #     return result
-
     def get_unsigned_libraries(self, instance:Instance):
         signed_libs_ids = set(self.books_to_scan.keys())
         unscanned_books = set()
