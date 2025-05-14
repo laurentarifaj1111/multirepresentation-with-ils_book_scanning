@@ -102,9 +102,7 @@ class Utils:
             {
                 "instance_name": r.instance_name,
                 "combination": r.combination,
-                "initial_solution_score": r.initial_solution_score,
-                "other_representation_score": r.other_representation_score,
-                "version1_score": r.version1_score
+                "fitness": r.version1_score
             }
             for r in results
         ]
