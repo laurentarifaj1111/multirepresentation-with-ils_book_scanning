@@ -1,76 +1,76 @@
 import os
-from greedy_with_calculated_initial.models import Results
-from greedy_with_calculated_initial.solution import Utils, InitialSolutionGenerator, SolutionOutputWriter
-from greedy_with_calculated_initial.solution.InstanceProvider import InstanceProvider
-from greedy_with_calculated_initial.solution.Solution import MultiRepresentationSolution
+import time
+
+from hill_climbing_with_greedy_initial.models import Results
+from hill_climbing_with_greedy_initial.solution import Utils, InitialSolutionGenerator, SolutionOutputWriter
+from hill_climbing_with_greedy_initial.solution.InstanceProvider import InstanceProvider
+from hill_climbing_with_greedy_initial.solution.Solution import HillClimbing
 from ils.models import Solver, Parser
+from ils.models.initial_solution import InitialSolution
 from ils.validator.multiple_validator import validate_all_solutions
 from ils.validator.validator import validate_solution
 
 
 solver = Solver()
-multi_representation_solution = MultiRepresentationSolution()
+multi_representation_solution = HillClimbing()
 directory = os.listdir('./input')
 results = []
 results_ils = []
-output_dir = './output'
+output_dir = 'output/output'
 os.makedirs(output_dir, exist_ok=True)
 version = "v1"
 
 multi_representation_solution_path = "./output/multi_representation/final/" + version + "/"
 initial_solution_ils_path = "./output/ils/initial/" + version + "/"
-final_solution_ils_path = "./output/ils/final/" + version + "/"
+solutions_path = "./output/ils/" + version + "/"
 results_summary_path = "./results/" + version + "/"
+results_summary_path = "output/output/multi_representation/final/v1/"
 
 output_file_paths = [
-    (multi_representation_solution_path, "multirepresentation_solution"),
-    (initial_solution_ils_path, "initial_solution_ils"),
-    (final_solution_ils_path, "final_solution_ils")]
-
+    (solutions_path, "final_solution_ils")
+]
 
 def main():
     file_names = Utils.get_input_file_names()
     for file_name in file_names:
-        # file_name = "B50_L5_D4.txt"
+        ten_minute_from_now = (time.time()) * 1000 + 600000
         path = Utils.get_input_file_paths(file_name)
-        print(f"Calculating results for: {file_name}")
+        # Read Instance
         instance = InstanceProvider.get_instance(path)
+        copy_of_ils_solution = None
+
+        # Generate Initital Solution using guided initial solution
         solution = InitialSolutionGenerator.generate_initial_solution(instance)
-        initial_score = solution.fitness
-        print(f"Initial solution for instance: {file_name}, score: {solution.fitness}")
-
-
-        improved_solution = multi_representation_solution.hill_climbing(solution.clone(), instance, 10000)
-        multi_representation_score = improved_solution.fitness
-        print(
-            f"Solution for instance: {file_name}, score: {improved_solution.fitness}, from solution with representations v2")
-        SolutionOutputWriter.write_solution_to_file(improved_solution, multi_representation_solution_path + file_name)
-        results_ils.append((file_name, "multirepresentation_solution",  improved_solution.fitness))
-
         parser = Parser(f'./input/{file_name}')
         data = parser.parse()
-        ils_solution_converted = Utils.convert_solution(instance, improved_solution.clone())
-        os.makedirs(os.path.dirname(initial_solution_ils_path), exist_ok=True)
-        ils_solution_converted.export(f'{initial_solution_ils_path}/{file_name}')
-        results_ils.append((file_name, "ils_solution_converted",  ils_solution_converted.fitness_score))
 
-        final_ils_solution = solver.iterated_local_search(data, ils_solution_converted)
-        os.makedirs(os.path.dirname(final_solution_ils_path), exist_ok=True)
-        final_ils_solution.export(f'{final_solution_ils_path}/{file_name}')
+        while ten_minute_from_now > time.time() * 1000:
+            # Apply hill climbing for 100 iterations
+            hill_climbing_solution = multi_representation_solution.hill_climbing(solution.clone(), instance, 100)
 
-        fitness = final_ils_solution.fitness_score
-        results.append(Results(file_name, "ils", initial_score, multi_representation_score, fitness))
-        os.path.isfile(final_solution_ils_path + file_name)
-        results_ils.append((file_name, "final_ils_solution",  fitness))
+            # Convert to other ils representation
+            ils_solution_converted = Utils.convert_solution(instance, hill_climbing_solution.clone())
 
-        print(f"ils Fitness for instance {file_name} is : {fitness}")
-        solutionsValidationsForIteration(output_file_paths, file_name)
+            # Apply iterated local search for 100 iterations
+            ils_solution = solver.iterated_local_search(data, ils_solution_converted, max_iterations=100)
 
+            # Convert to algorithm with greedy initial soultion representation
+            solution = Utils.convert_solution_to_v2(ils_solution, instance)
 
+            solutionsValidationsForIteration(output_file_paths, file_name)
+
+        # Create directory and export
+        os.makedirs(os.path.dirname(solutions_path), exist_ok=True)
+        ils_solution.export(f'{solutions_path}/{file_name}')
+
+        results.append(Results(file_name, "ils", solution.fitness))
+        results_ils.append((file_name, "ils_solution_converted", solution.fitness))
+
+    # Validate all solutions
     all_solution_validations(output_file_paths)
-    Utils.write_results(results, version)
 
-def solutionsValidationsForIteration(file_paths:[str], file_name:str):
+
+def solutionsValidationsForIteration(file_paths, file_name:str):
         print("\nValidating all solutions...")
         for file_path, name in file_paths:
             input_path = "./input/" + file_name
@@ -78,7 +78,7 @@ def solutionsValidationsForIteration(file_paths:[str], file_name:str):
             result = validate_solution(input_path, output_path, True)
             print(result)
 
-def all_solution_validations(file_paths:[str]):
+def all_solution_validations(file_paths):
     for file_path, algorithm_name in file_paths:
         validate_all_solutions(input_dir='./input', output_dir=file_path)
 

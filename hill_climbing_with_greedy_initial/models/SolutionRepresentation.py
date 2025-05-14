@@ -1,7 +1,7 @@
 from ast import Index
 from collections import OrderedDict
 
-from greedy_with_calculated_initial.models.Instance import Instance
+from hill_climbing_with_greedy_initial.models.Instance import Instance
 
 
 class SolutionRepresentation:
