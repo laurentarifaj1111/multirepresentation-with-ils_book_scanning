@@ -39,7 +39,7 @@ def main():
         instance = InstanceProvider.get_instance(path)
         copy_of_ils_solution = None
 
-        # Generate Initital Solution using guided initial solution
+        # Generate Initial Solution using guided initial solution
         solution = InitialSolutionGenerator.generate_initial_solution(instance)
         parser = Parser(f'./input/{file_name}')
         data = parser.parse()

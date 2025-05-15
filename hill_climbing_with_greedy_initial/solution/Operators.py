@@ -6,7 +6,7 @@ from hill_climbing_with_greedy_initial.models.Instance import Instance
 from hill_climbing_with_greedy_initial.models.SolutionRepresentation import SolutionRepresentation
 
 
-# Replaces a random signed library with an unsigend library
+# Replaces a random signed library with an unsigned library
 class ReplaceLibsTweakOperator:
     def tweak(self, solution: SolutionRepresentation, instance: Instance) -> SolutionRepresentation:
         books_to_scan = solution.books_to_scan
